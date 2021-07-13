@@ -1,24 +1,76 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import FormInput from './FormInput'
 
 
 export default function BmiCalculator() {
-    const [heightUnit, setHeightUnit] = useState('');
-    const [weightUnit, setWeightUnit] = useState('');
-    const [unit, setUnit] = useState('');
+    const [heightUnit, setHeightUnit] = useState('cm');
+    const [weightUnit, setWeightUnit] = useState('kg');
+    const [unit, setUnit] = useState('Metric');
+     const [count, setCount] = useState({
+        heightCount: '0',
+        weightCount: '0',
+        inchesCount: '0'
+    });
+    // const [count, setCount] = useState({
+    //     data: {
+    //     heightCount: '0',
+    //     weightCount: '0',
+    //     inchesCount: '0'
+    //     }
+    // });
+
+
+    const {heightCount, inchesCount, weightCount} = count;
+
+     useEffect(() => {
+        metricBMI(heightCount, weightCount);
+     }, [heightCount, weightCount]);
 
     const onChangeInput = e => {
+        const {name, value} = e.target;
+        // setCount({
+        //     data: {
+        //         ...data,
+        //     [name]: value
+        //     }
+        // });
+        setCount(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
     }
+
+
     const onSelectTag = e => {
         setUnit(e.target.value);
         if (e.target.value === 'Metric'){
-            setHeightUnit('cm');
+            setHeightUnit('m');
             setWeightUnit('kg');
         } else {
             setHeightUnit('ft');
             setWeightUnit('lbs');
         }
     }
+
+    const metricBMI = (height, weight) => {
+        if(height > 0 && weight > 0){
+            const bmi = weight / (height * height);
+        }
+    }
+
+    const resetData = e => {
+        e.preventDefault();
+        setUnit('Metric');
+        setCount({
+            heightCount: '0',
+            weightCount: '0',
+            inchesCount: '0'
+        });
+        setHeightUnit('cm');
+        setWeightUnit('kg');
+    }
+
+
     return (
         <>
         <div className="bmi-inputs">
@@ -41,7 +93,7 @@ export default function BmiCalculator() {
                 type="text"
                 name="heightCount"
                 title={`Height(${heightUnit})`}
-                value=""
+                value={heightCount}
                 onChange={onChangeInput}
                 />
                 {
@@ -50,7 +102,7 @@ export default function BmiCalculator() {
                     type="text"
                     name="inchesCount"
                     title={`(in)`}
-                    value=""
+                    value={inchesCount}
                     onChange={onChangeInput}
                     /> : ' '
                 }
@@ -59,11 +111,11 @@ export default function BmiCalculator() {
                 type="text"
                 name="weightCount"
                 title={`Weight(${weightUnit})`}
-                value=""
+                value={weightCount}
                 onChange={onChangeInput}
                 />
             </div>
-            <button className="button" type="submit">
+            <button className="button" onClick={resetData} type="submit">
                 Reset
             </button>
         </div>
