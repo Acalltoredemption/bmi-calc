@@ -1,8 +1,10 @@
 import React, {useState, useEffect} from 'react'
-import FormInput from './FormInput'
+import FormInput from './FormInput';
+import PropTypes from 'prop-types';
 
 
-export default function BmiCalculator() {
+const BmiCalculator = props => {
+    const { getBmiValue } = props;
     const [heightUnit, setHeightUnit] = useState('cm');
     const [weightUnit, setWeightUnit] = useState('kg');
     const [unit, setUnit] = useState('Metric');
@@ -24,6 +26,8 @@ export default function BmiCalculator() {
 
      useEffect(() => {
         metricBMI(heightCount, weightCount);
+        imperialBMI(heightCount, weightCount, inchesCount);
+        //eslint-disable-next-line
      }, [heightCount, weightCount]);
 
     const onChangeInput = e => {
@@ -44,7 +48,7 @@ export default function BmiCalculator() {
     const onSelectTag = e => {
         setUnit(e.target.value);
         if (e.target.value === 'Metric'){
-            setHeightUnit('m');
+            setHeightUnit('cm');
             setWeightUnit('kg');
         } else {
             setHeightUnit('ft');
@@ -54,7 +58,18 @@ export default function BmiCalculator() {
 
     const metricBMI = (height, weight) => {
         if(height > 0 && weight > 0){
-            const bmi = weight / (height * height);
+            const heightToMeter = height / 100;
+            const bmi = weight / (heightToMeter * heightToMeter);
+            getBmiValue(Math.round(bmi));
+        }
+    }
+    const imperialBMI = (height, weight, inches) => {
+        if(height > 0 && weight > 0){
+            //12 inches = 1 foot
+            //convert feet to inches
+            const inchTotal = (height * 12) + parseInt(inches);
+            const bmi = 703*(weight / (inchTotal * inchTotal))
+            getBmiValue(Math.round(bmi));
         }
     }
 
@@ -68,6 +83,7 @@ export default function BmiCalculator() {
         });
         setHeightUnit('cm');
         setWeightUnit('kg');
+        getBmiValue(0);
     }
 
 
@@ -122,3 +138,7 @@ export default function BmiCalculator() {
         </>
     )
 }
+BmiCalculator.propTypes = {
+    getBmiValue: PropTypes.func.isRequired
+}
+export default BmiCalculator;
